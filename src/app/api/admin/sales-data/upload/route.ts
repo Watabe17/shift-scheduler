@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
     const fileText = await file.text();
 
-    return new Promise((resolve, reject) => {
+    return new Promise<NextResponse>((resolve, reject) => {
       Papa.parse(fileText, {
         header: true,
         skipEmptyLines: true,
