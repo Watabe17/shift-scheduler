@@ -14,6 +14,7 @@ interface EmployeeShiftRequestModalProps {
   date: Date;
   positions: Position[];
   requestToEdit?: ShiftRequest | null;
+  availableTimeSlots: string[];
 }
 
 export default function EmployeeShiftRequestModal({

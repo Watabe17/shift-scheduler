@@ -14,6 +14,8 @@ interface RequiredStaffRule { id: string; positionId: string; position: Position
 interface TotalHours { totalHours: number; totalMinutes: number; }
 
 interface MyCalendarEvent extends CalendarEvent {
+  start: Date; // オーバーライド
+  end: Date;   // オーバーライド
   resource: Shift;
 }
 
@@ -112,7 +114,7 @@ export default function EmployeeShiftsPage() {
 
     const tableColumn = ["日付", "曜日", "ポジション", "勤務時間"];
     const tableRows: any[][] = [];
-    const sortedEvents = [...events].sort((a,b) => a.start.getTime() - b.start.getTime());
+    const sortedEvents = [...events].sort((a,b) => (a.start as Date).getTime() - (b.start as Date).getTime());
 
     sortedEvents.forEach(event => {
       tableRows.push([
@@ -190,7 +192,7 @@ export default function EmployeeShiftsPage() {
                         {Object.values(Views).map(viewName => (
                             <button key={viewName} onClick={() => toolbar.onView(viewName)}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${toolbar.view === viewName ? 'bg-blue-600 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}>
-                            { {month: '月', week: '週', day: '日', agenda: 'リスト'}[viewName] || viewName }
+                            { {month: '月', week: '週', day: '日', work_week: '稼働週', agenda: 'リスト'}[viewName] || viewName }
                             </button>
                         ))}
                         </div>

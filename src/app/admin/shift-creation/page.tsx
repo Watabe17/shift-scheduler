@@ -332,7 +332,10 @@ export default function ShiftCreationPage() {
     setIsModalOpen(true);
   }, []);
 
-  const handleSaveShift = async (shiftData: Partial<Shift>, isNew: boolean) => {
+  const handleSaveShift = async (
+    shiftData: Partial<Shift>,
+    isNew: boolean
+  ) => {
     try {
       const url = isNew ? '/api/admin/shifts' : `/api/admin/shifts/${shiftData.id}`;
       const method = isNew ? 'POST' : 'PUT';
@@ -351,6 +354,10 @@ export default function ShiftCreationPage() {
     } catch (err: any) {
       toast.error(`Error: ${err.message}`);
     }
+  };
+
+  const handleUpdateShift = async (updatedData: Partial<Shift>) => {
+    await handleSaveShift(updatedData, false);
   };
 
   const handleDeleteShift = useCallback(async () => {
@@ -460,6 +467,7 @@ export default function ShiftCreationPage() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSave={handleSaveShift}
+        onUpdate={handleUpdateShift} // 確実に onUpdate を渡す
         shift={selectedShift}
         positions={positions}
         employees={employees}

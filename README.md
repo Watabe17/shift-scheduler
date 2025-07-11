@@ -56,3 +56,11 @@ onUpdate: (updatedData: Partial<Shift>) => Promise<void>;
 
 その後、デプロイが通るか確認するために `npm run build` でローカルビルドが成功する状態にしてください。
 ```
+## 開発メモ
+
+### ShiftEditModal コンポーネントの修正（2025年7月）
+
+親コンポーネントから `onUpdate` props を渡す設計に変更。  
+型定義 (`ShiftEditModalProps`) に `onUpdate: (updatedData: Partial<Shift>) => Promise<void>` を追加し、コンポーネント内で受け取る必要あり。
+
+→ 修正ミスがあると Vercel デプロイ時に TypeScript エラーが発生するので注意。

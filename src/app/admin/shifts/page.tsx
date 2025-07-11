@@ -50,6 +50,7 @@ export default function ShiftsManagementPage() {
   const [draftShifts, setDraftShifts] = useState<ShiftWithRelations[]>([]);
   const [confirmedShifts, setConfirmedShifts] = useState<ShiftWithRelations[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
+  const [employees, setEmployees] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'draft' | 'confirmed'>('draft');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,20 +59,23 @@ export default function ShiftsManagementPage() {
   const fetchShifts = async () => {
     setIsLoading(true);
     try {
-      const [draftRes, confirmedRes, positionsRes] = await Promise.all([
+      const [draftRes, confirmedRes, positionsRes, employeesRes] = await Promise.all([
         fetch(`/api/admin/shifts?status=${ShiftStatus.DRAFT}`),
         fetch(`/api/admin/shifts?status=${ShiftStatus.CONFIRMED}`),
         fetch("/api/positions"),
+        fetch("/api/admin/employees"),
       ]);
-      if (!draftRes.ok || !confirmedRes.ok || !positionsRes.ok) throw new Error("データの取得に失敗しました。");
+      if (!draftRes.ok || !confirmedRes.ok || !positionsRes.ok || !employeesRes.ok) throw new Error("データの取得に失敗しました。");
       
       const draftData: ShiftWithRelations[] = await draftRes.json();
       const confirmedData: ShiftWithRelations[] = await confirmedRes.json();
       const positionsData = await positionsRes.json();
+      const employeesData: User[] = await employeesRes.json();
 
       setDraftShifts(draftData);
       setConfirmedShifts(confirmedData);
       setPositions(positionsData);
+      setEmployees(employeesData);
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -138,7 +142,16 @@ export default function ShiftsManagementPage() {
   return (
     <div className="container mx-auto p-4">
       <ToastContainer position="top-right" autoClose={3000} />
-      <ShiftEditModal isOpen={isModalOpen} onClose={handleCloseModal} onUpdate={handleUpdateShift} shift={selectedShift} positions={positions} />
+      <ShiftEditModal 
+        isOpen={isModalOpen} 
+        onClose={handleCloseModal} 
+        onSave={async () => { /* このページでは新規作成は行いません */ }} 
+        onUpdate={handleUpdateShift} 
+        shift={selectedShift} 
+        positions={positions} 
+        employees={employees} 
+        isCreating={false} 
+      />
       
       <h1 className="text-2xl font-bold mb-4">シフト管理</h1>
 
