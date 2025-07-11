@@ -9,13 +9,14 @@ interface ShiftEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (shiftData: ShiftData, isNew: boolean) => void;
+  onUpdate: (updatedData: Partial<Shift>) => Promise<void>;
   shift?: Shift | null;
   positions: Position[];
   employees: User[];
   isCreating: boolean;
 }
 
-export default function ShiftEditModal({ isOpen, onClose, onSave, shift, positions, employees, isCreating }: ShiftEditModalProps) {
+export default function ShiftEditModal({ isOpen, onClose, onSave, onUpdate, shift, positions, employees, isCreating }: ShiftEditModalProps) {
   const [formData, setFormData] = useState({
     date: "",
     startTime: "",
@@ -55,11 +56,17 @@ export default function ShiftEditModal({ isOpen, onClose, onSave, shift, positio
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
+    const dataToSend = {
       id: isCreating ? undefined : shift?.id,
       ...formData,
       date: new Date(formData.date),
-    }, isCreating);
+    };
+
+    if (isCreating) {
+      onSave(dataToSend, true);
+    } else {
+      onUpdate(dataToSend);
+    }
   };
 
   return (
