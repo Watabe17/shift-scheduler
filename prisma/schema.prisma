@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role
+  createdAt DateTime @default(now())
+
+  positions     Position[]
+  shiftRequests ShiftRequest[]
+  shifts        Shift[]
+  notifications Notification[]
+}
+
+model ShiftRequest {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime
+  startTime String
+  endTime   String
+  status    String   @default("pending") // pending, approved, rejected
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  shift     Shift?
+
+  positionId String
+  position   Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
+}
+
+model Shift {
+  id             String        @id @default(uuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  positionId     String
+  position       Position      @relation(fields: [positionId], references: [id], onDelete: Cascade)
+  date           DateTime
+  startTime      String
+  endTime        String
+  status         ShiftStatus   @default(DRAFT)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  shiftRequestId String?       @unique
+  shiftRequest   ShiftRequest? @relation(fields: [shiftRequestId], references: [id], onDelete: SetNull)
+}
+
+model Position {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  users           User[]
+  shifts          Shift[]
+  requiredStaffs  RequiredStaff[]
+  ShiftRequest    ShiftRequest[]
+}
+
+model RequiredStaff {
+  id         String   @id @default(uuid())
+  position   Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
+  positionId String
+  dayOfWeek  Int
+  timeSlot   String
+  count      Int
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  EMPLOYEE
+  ADMIN
+}
+
+enum ShiftStatus {
+  DRAFT
+  CONFIRMED
+}
+
+model SalesData {
+  id        String   @id @default(uuid())
+  date      DateTime
+  timeSlot  String
+  amount    Int
+  createdAt DateTime @default(now())
+}

@@ -1,0 +1,349 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+|--------------------------------------------------------------------------
+| Base Styles
+|--------------------------------------------------------------------------
+|
+| Basic styles for the body and html elements.
+|
+*/
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out forwards;
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* =============================================== */
+/* === React Big Calendar: Layout Overrides === */
+/* =============================================== */
+/* This section provides a robust, Flexbox-based layout for the calendar,
+   ensuring consistent sizing and responsiveness. */
+
+/* ----- 1. Main Calendar Container ----- */
+/* Establishes a flex column layout for the entire month view.
+   The height: 100% allows it to fill its parent container (e.g., a div with height: 80vh),
+   which is crucial for vertical space distribution. */
+.rbc-calendar {
+  height: 100%;
+}
+
+.rbc-month-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid #e5e7eb; /* gray-200 */
+  border-radius: 0.75rem; /* rounded-xl */
+  overflow: hidden; /* Ensures the rounded corners apply to the content */
+}
+
+/* ----- 2. Header Row ----- */
+/* The header row (containing day names like "Mon", "Tue") should not grow or shrink. */
+.rbc-month-header {
+  flex: 0 0 auto; /* Do not grow, do not shrink, base size is auto */
+}
+
+/* ----- 3. Content Wrapper for Weeks ----- */
+/* This is the most critical part. It wraps all the week rows.
+   - It's a flex container itself to manage the rows.
+   - flex: 1 1 auto makes it take up all available vertical space left by the header.
+*/
+.rbc-month-view > .rbc-row:not(.rbc-month-header) {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto; /* CRITICAL: This makes the content area flexible */
+  position: relative;
+}
+
+/* ----- 4. Individual Week Rows ----- */
+/* Each week row must be a flex item to distribute the space from the wrapper above.
+   - flex: 1 1 0% ensures each row shares the available height equally.
+   - min-height prevents rows from becoming too small on large screens or in months with many weeks.
+*/
+.rbc-month-row {
+  display: flex;
+  flex: 1 1 0%; /* CRITICAL: Distributes height equally among weeks */
+  min-height: 120px; /* Adjust as needed */
+  position: relative; /* Needed for event positioning */
+}
+
+/* ----- 5. Day Cell Styling ----- */
+/* Ensures day cells fill their parent row horizontally. */
+.rbc-day-bg {
+  flex: 1 1 0%;
+}
+
+/* This container holds the events within a day cell.
+   We allow vertical scrolling if there are too many events to fit. */
+.rbc-day-content {
+  height: 100%;
+  overflow-y: auto;
+  padding: 2px 3px;
+}
+
+/* Helper to ensure event rows inside the content area take full width */
+.rbc-row-content .rbc-row {
+  width: 100%;
+}
+
+/* ----- 6. General Cleanup and Aesthetics ----- */
+/* Remove default outlines and add subtle borders for better visual separation. */
+.rbc-day-bg + .rbc-day-bg {
+  border-left: 1px solid #f3f4f6; /* gray-100 */
+}
+
+.rbc-month-row + .rbc-month-row {
+  border-top: 1px solid #e5e7eb; /* gray-200 */
+}
+
+.rbc-header {
+  border-bottom: 1px solid #e5e7eb; /* gray-200 */
+  padding: 0.75rem 0; /* 12px */
+  font-weight: 600; /* semibold */
+  font-size: 0.875rem; /* text-sm */
+}
+
+/* Improve visibility for "Today" */
+.rbc-day-bg.rbc-today {
+  background-color: #f0f9ff; /* sky-50 */
+}
+
+/* Remove the default blue outline on focus for a cleaner look */
+.rbc-button-link:focus,
+.rbc-event:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/*
+|--------------------------------------------------------------------------
+| React Big Calendar Custom Styles
+|--------------------------------------------------------------------------
+| A robust set of overrides to ensure consistent and responsive layout.
+*/
+
+/* ----- 1. Main Calendar Container ----- */
+.rbc-month-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Fill container to allow vertical space distribution */
+  border: 1px solid #e5e7eb; /* gray-200 */
+  border-radius: 0.75rem; /* rounded-xl */
+  overflow: hidden;
+}
+
+/* ----- 2. Day Header (Sun, Mon, Tue...) ----- */
+.rbc-month-header {
+  display: flex;
+  flex: 0 0 auto; /* Header should not grow or shrink */
+}
+
+.rbc-header {
+  flex: 1;
+  text-align: center;
+  padding: 0.5rem 0; /* p-2 */
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.rbc-header + .rbc-header {
+  border-left: 1px solid #e5e7eb;
+}
+
+/* ----- 3. Main Content Area (Weeks & Days) ----- */
+
+/* This targets the wrapper for all week rows */
+.rbc-month-view > .rbc-row:not(.rbc-month-header) {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto; /* This is the key: makes the content area flexible */
+  position: relative;
+}
+
+/* Each week row */
+.rbc-month-row {
+  display: flex;
+  flex: 1 1 0%; /* Each row will share height equally */
+  min-height: 100px;
+  position: relative; /* Needed for absolute positioning of events */
+}
+
+.rbc-month-row + .rbc-month-row {
+  border-top: 1px solid #e5e7eb;
+}
+
+/* The background grid for the week */
+.rbc-row-bg {
+  display: flex;
+  flex: 1;
+}
+
+/* Each day's background cell */
+.rbc-day-bg {
+  flex: 1;
+}
+
+.rbc-day-bg + .rbc-day-bg {
+  border-left: 1px solid #e5e7eb;
+}
+
+.rbc-off-range-bg {
+  background-color: #f9fafb; /* gray-50 */
+}
+
+/* The content layer for events, positioned over the background */
+.rbc-row-content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  height: 100%;
+}
+.rbc-row-content .rbc-row {
+  width: 100%;
+}
+
+/* The actual date number in the cell */
+.rbc-date-cell {
+  padding: 0.25rem 0.5rem; /* p-1 px-2 */
+  text-align: left;
+}
+
+/* ----- 4. Events ----- */
+
+/* The container for events on a given day */
+.rbc-row-segment {
+  padding: 0 4px; /* Give a little horizontal space for events */
+}
+
+/* Styles applied to each event instance */
+.rbc-event {
+  margin-bottom: 2px; /* Prevent events from sticking together */
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  cursor: default;
+}
+
+/* ----- 5. Agenda (List) View for Mobile ----- */
+
+.rbc-agenda-view table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+}
+.rbc-agenda-view table thead {
+  background-color: #f9fafb;
+}
+.rbc-agenda-view .rbc-agenda-date-cell,
+.rbc-agenda-view .rbc-agenda-time-cell,
+.rbc-agenda-view .rbc-agenda-event-cell {
+  padding: 0.75rem; /* p-3 */
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.rbc-agenda-view .rbc-agenda-date-cell,
+.rbc-agenda-view .rbc-agenda-time-cell {
+  padding: 0.5rem;
+}
+
+/* Custom Styles for Shift Blocks in Calendar */
+.shift-block {
+    position: absolute;
+    height: 70px;
+    top: 5px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: all 0.3s;
+    z-index: 10;
+    width: 90%; /* Adjust as needed */
+    left: 5%; /* Center the block */
+}
+
+.shift-block:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.shift-block.dragging {
+    opacity: 0.8;
+    transform: rotate(5deg);
+    z-index: 1000;
+}
+
+.shift-morning {
+    background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+}
+
+.shift-afternoon {
+    background: linear-gradient(135deg, #4ECDC4, #44A08D);
+}
+
+.shift-evening {
+    background: linear-gradient(135deg, #45B7D1, #96C93D);
+}
+
+.shift-night {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.shift-full {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+/* Styling for drop zone when dragging over */
+.employee-slot.drop-zone {
+    background: #e3f2fd;
+    border: 2px dashed #2196f3;
+}
