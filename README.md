@@ -64,3 +64,4 @@ onUpdate: (updatedData: Partial<Shift>) => Promise<void>;
 型定義 (`ShiftEditModalProps`) に `onUpdate: (updatedData: Partial<Shift>) => Promise<void>` を追加し、コンポーネント内で受け取る必要あり。
 
 → 修正ミスがあると Vercel デプロイ時に TypeScript エラーが発生するので注意。
+"// redeploy trigger" 
